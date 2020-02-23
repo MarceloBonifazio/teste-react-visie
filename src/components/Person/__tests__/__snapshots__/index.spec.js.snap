@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SimpleSelect Should component render correctly... With some data 1`] = `
+<body>
+  <div>
+    <div
+      class="MuiPaper-root makeStyles-root-61 MuiPaper-elevation1 MuiPaper-rounded"
+      style="color: black;"
+    >
+      <button
+        aria-label="Remove"
+        class="MuiButtonBase-root MuiIconButton-root"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="MuiIconButton-label"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="MuiTouchRipple-root"
+        />
+      </button>
+      Marcelo Bonifazio
+    </div>
+  </div>
+</body>
+`;
+
+exports[`SimpleSelect Should component render correctly... Without data 1`] = `
+<body>
+  <div>
+    <div
+      class="MuiPaper-root makeStyles-root-1 MuiPaper-elevation1 MuiPaper-rounded"
+    >
+      <button
+        aria-label="Remove"
+        class="MuiButtonBase-root MuiIconButton-root"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="MuiIconButton-label"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root"
+            focusable="false"
+            role="presentation"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="MuiTouchRipple-root"
+        />
+      </button>
+      
+    </div>
+  </div>
+</body>
+`;

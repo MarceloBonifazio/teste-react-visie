@@ -1,0 +1,283 @@
+import React from 'react';
+import { render, waitForElement, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import uuid from 'uuid/v4';
+import faker from 'faker';
+
+import Arguments from '../index';
+
+let changeParentState = jest.fn();
+
+describe('Arguments', () => {
+  describe('Should component render correctly...', () => {
+    it('in initial render', async () => {
+      const state = [
+        { id: uuid(), topics: [], title: '' },
+      ];
+
+      const { baseElement, queryByText, getByText } = render(
+        <Arguments
+          id="Argumentos"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(baseElement).toMatchSnapshot();
+      fireEvent.mouseEnter(queryByText(/Adicionar outro tópico/));
+      await waitForElement(() => getByText('Máximo 3 tópicos (1 de 3)'));
+      expect(getByText('Máximo 3 tópicos (1 de 3)')).toBeInTheDocument();
+      fireEvent.mouseLeave(queryByText(/Adicionar outro tópico/));
+      await waitForElementToBeRemoved(() => getByText('Máximo 3 tópicos (1 de 3)'))
+      expect(queryByText('Máximo 3 tópicos (1 de 3)')).not.toBeInTheDocument();
+    });
+
+    it('with 2 Topics', async () => {
+      const state = [
+        { id: uuid(), topics: [], title: '' },
+        { id: uuid(), topics: [], title: '' },
+      ];
+      const { queryByText, baseElement, getByText } = render(
+        <Arguments
+          id="Argumentos"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(baseElement).toMatchSnapshot();
+      fireEvent.mouseEnter(queryByText(/Adicionar outro tópico/));
+      await waitForElement(() => getByText('Máximo 3 tópicos (2 de 3)'));
+      expect(getByText('Máximo 3 tópicos (2 de 3)')).toBeInTheDocument();
+      fireEvent.mouseLeave(queryByText(/Adicionar outro tópico/));
+      await waitForElementToBeRemoved(() => getByText('Máximo 3 tópicos (2 de 3)'))
+      expect(queryByText('Máximo 3 tópicos (2 de 3)')).not.toBeInTheDocument();
+    });
+
+    it('with 3 Topics', async () => {
+      const state = [
+        { id: uuid(), topics: [], title: '' },
+        { id: uuid(), topics: [], title: '' },
+        { id: uuid(), topics: [], title: '' },
+      ];
+      const { queryByText, baseElement, getByText } = render(
+        <Arguments
+          id="Argumentos"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(baseElement).toMatchSnapshot();
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).toBeInTheDocument();
+      fireEvent.mouseEnter(queryByText(/Adicionar outro tópico/));
+      await waitForElement(() => getByText('Máximo 3 tópicos (3 de 3)'));
+      expect(getByText('Máximo 3 tópicos (3 de 3)')).toBeInTheDocument();
+      fireEvent.mouseLeave(queryByText(/Adicionar outro tópico/));
+      await waitForElementToBeRemoved(() => getByText('Máximo 3 tópicos (3 de 3)'))
+      expect(queryByText('Máximo 3 tópicos (3 de 3)')).not.toBeInTheDocument();
+    });
+
+    it('with some content', () => {
+      const state = [{ id: uuid(), topics: ['Key 1', 'Key 2'], title: 'Teste' }];
+      const { getByText, getByLabelText, baseElement } = render(
+        <Arguments
+          id="Argumentos"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(baseElement).toMatchSnapshot();
+      expect(getByText(/Tópico 1/)).toBeInTheDocument();
+      expect(getByText(/Key 1/)).toBeInTheDocument();
+      expect(getByText(/Key 2/)).toBeInTheDocument();
+      expect(getByLabelText(/Titulo do tópico/).value).toStrictEqual('Teste');
+    });
+
+    it('without content', async () => {
+      const state = [];
+      const { queryByText, baseElement, getByText } = render(
+        <Arguments
+          id="Argumentos"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(baseElement).toMatchSnapshot();
+      expect(queryByText(/Tópico 1/)).not.toBeInTheDocument();
+      expect(queryByText(/Titulo do tópico/)).not.toBeInTheDocument();
+      fireEvent.mouseEnter(queryByText(/Adicionar outro tópico/));
+      await waitForElement(() => getByText('Máximo 3 tópicos (0 de 3)'));
+      expect(getByText('Máximo 3 tópicos (0 de 3)')).toBeInTheDocument();
+      fireEvent.mouseLeave(queryByText(/Adicionar outro tópico/));
+      await waitForElementToBeRemoved(() => getByText('Máximo 3 tópicos (0 de 3)'))
+      expect(queryByText('Máximo 3 tópicos (0 de 3)')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Should actions works correctly...', () => {
+    it('writing some topic title and change value after', () => {
+      let title = faker.lorem.sentence();
+      let anotherTitle = faker.lorem.sentence();
+      const state = [
+        { id: uuid(), topics: [], title: '' },
+      ];
+      
+      changeParentState = ({ id }) => {
+        expect(id[0]).toStrictEqual({ ...state[0], title });
+      };
+
+      const { getByLabelText } = render(
+        <Arguments
+          id="id"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      fireEvent.change(getByLabelText(/Titulo do tópico/), { target: { value: title } });
+      title = anotherTitle;
+      fireEvent.change(getByLabelText(/Titulo do tópico/), { target: { value: anotherTitle } });
+    });
+
+    it('adding or removing keywords', () => {
+      let index;
+      let value;
+      let type = 'add';
+      let topic1 = faker.lorem.sentence(2);
+      let topic2 = faker.lorem.sentence(2);
+      let topic3 = faker.lorem.sentence(2);
+      let topic4 = faker.lorem.sentence(2);
+      let topic5 = faker.lorem.sentence(2);
+      let topic6 = faker.random.words(2);
+      let topic7 = faker.random.words(2);
+      let topic8 = faker.random.words(2);
+      let topic9 = faker.random.words(2);
+
+      let someRandomTopic1 = faker.random.words(2);
+      let someRandomTopic2 = faker.lorem.sentence(2);
+      let someRandomTopic3 = faker.random.words(2);
+
+      const state = [
+        { id: uuid(), topics: [topic1, topic6, topic7], title: '' },
+        { id: uuid(), topics: [topic2, topic5, topic9], title: '' },
+        { id: uuid(), topics: [topic3, topic4, topic8], title: '' },
+      ];
+      
+      changeParentState = ({ id }) => {
+        if (type === 'add') {
+          expect(id[index].topics).toContain(value);
+        } else {
+          expect(id[index].topics).not.toContain(value);
+        }
+      };
+      
+      const { getByTestId, queryByText } = render(
+        <Arguments
+          id="id"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(queryByText(topic1)).toBeInTheDocument();
+      expect(queryByText(topic2)).toBeInTheDocument();
+      expect(queryByText(topic3)).toBeInTheDocument();
+      expect(queryByText(topic4)).toBeInTheDocument();
+      expect(queryByText(topic5)).toBeInTheDocument();
+      expect(queryByText(topic6)).toBeInTheDocument();
+      expect(queryByText(topic7)).toBeInTheDocument();
+      expect(queryByText(topic8)).toBeInTheDocument();
+      expect(queryByText(topic9)).toBeInTheDocument();
+      expect(queryByText(someRandomTopic1)).not.toBeInTheDocument();
+      expect(queryByText(someRandomTopic2)).not.toBeInTheDocument();
+      expect(queryByText(someRandomTopic3)).not.toBeInTheDocument();
+      value = someRandomTopic1;
+      index = 0;
+      fireEvent.change(getByTestId(`keyword${index}`), { target: { value: someRandomTopic1 } });
+      fireEvent.keyDown(getByTestId(`keyword${index}`), { key: 'Enter', keyCode: 13, which: 13 });
+      value = someRandomTopic3;
+      index = 2;
+      fireEvent.change(getByTestId(`keyword${index}`), { target: { value: someRandomTopic3 } });
+      fireEvent.keyDown(getByTestId(`keyword${index}`), { key: 'Enter', keyCode: 13, which: 13 });
+      value = someRandomTopic2;
+      index = 1;
+      fireEvent.change(getByTestId(`keyword${index}`), { target: { value: someRandomTopic2 } });
+      fireEvent.keyDown(getByTestId(`keyword${index}`), { key: 'Enter', keyCode: 13, which: 13 });
+      expect(queryByText(someRandomTopic1)).toBeInTheDocument();
+      expect(queryByText(someRandomTopic2)).toBeInTheDocument();
+      expect(queryByText(someRandomTopic3)).toBeInTheDocument();
+
+      type = 'rem';
+      value = topic1;
+      index = 0;
+      fireEvent.click(queryByText(topic1).parentElement.querySelector('svg'));
+      expect(queryByText(topic1)).not.toBeInTheDocument();
+      value = someRandomTopic3;
+      index = 2;
+      fireEvent.click(queryByText(someRandomTopic3).parentElement.querySelector('svg'));
+      expect(queryByText(someRandomTopic3)).not.toBeInTheDocument();
+      value = topic5;
+      index = 2;
+      fireEvent.click(queryByText(topic5).parentElement.querySelector('svg'));
+      expect(queryByText(topic5)).not.toBeInTheDocument();
+    });
+
+    it('adding or removing topic', () => {
+      const state = [];
+      let changeParentState = jest.fn();
+
+      const { getByText, queryByText, debug, que } = render(
+        <Arguments
+          id="id"
+          changeParentState={changeParentState}
+          data={state}
+        />
+      );
+      expect(queryByText(/Tópico 1/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      fireEvent.click(getByText(/Adicionar outro tópico/));
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(1);
+      fireEvent.click(getByText(/Adicionar outro tópico/));
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(2);
+      fireEvent.click(getByText(/Adicionar outro tópico/));
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(3);
+      fireEvent.click(getByText(/Adicionar outro tópico/));
+      expect(changeParentState).toHaveBeenCalledTimes(3);
+      fireEvent.click(queryByText(/Tópico 1/).querySelector('button'));
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(4);
+      fireEvent.click(queryByText(/Tópico 1/).querySelector('button'));
+      expect(queryByText(/Tópico 1/)).toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(5);
+      fireEvent.click(queryByText(/Tópico 1/).querySelector('button'));
+      expect(queryByText(/Tópico 1/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 2/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 3/)).not.toBeInTheDocument();
+      expect(queryByText(/Tópico 4/)).not.toBeInTheDocument();
+      expect(changeParentState).toHaveBeenCalledTimes(6);
+    });
+  });
+});
