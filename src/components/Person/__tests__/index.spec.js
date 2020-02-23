@@ -27,6 +27,7 @@ describe('SimpleSelect', () => {
       );
       // debug();
       expect(baseElement).toMatchSnapshot();
+      debug();
       console.log(
         getByText(/Marcelo Bonifazio/).getAttribute('style')
       );

@@ -6,7 +6,7 @@ describe('index', () => {
   });
 
   it('Should call ReactDOM.render correctly', () => {
-    require('../../index');
+    require('../index');
     expect(ReactDOM.render).toHaveBeenCalledTimes(1);
   });
 });
