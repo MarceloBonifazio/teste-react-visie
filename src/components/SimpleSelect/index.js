@@ -32,7 +32,7 @@ const SimpleSelect = ({
       variant="outlined"
       className={classes.formControl}
       disabled={disabled}
-      error={hasError}
+      error={hasError && true}
     >
       <InputLabel ref={inputLabel} htmlFor={`${id}-simpleSelect`}>
         {label}
@@ -44,13 +44,14 @@ const SimpleSelect = ({
         inputProps={{
           name: `${id}-simpleSelect`,
           id: `${id}-simpleSelect`,
+          'data-testid': 'select',
         }}
         labelWidth={labelWidth}
       >
         <option aria-label={label} value="" />
-        {list.map(item => (
-          <option value={item.code} key={item.code}>
-            {item.value}
+        {list.map(({ code, value: val }) => (
+          <option value={code} key={code}>
+            {val}
           </option>
         ))}
       </Select>

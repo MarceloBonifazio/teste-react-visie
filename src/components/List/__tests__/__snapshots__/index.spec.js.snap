@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`List Should component render correctly... With mock response 1`] = `
+<body>
+  <div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+    <div>
+      Person
+    </div>
+  </div>
+</body>
+`;
+
+exports[`List Should component render correctly... Without data 1`] = `
+<body>
+  <div>
+    <div
+      class="MuiPaper-root makeStyles-root-1 MuiPaper-elevation1 MuiPaper-rounded"
+    >
+      Lista vazia
+    </div>
+  </div>
+</body>
+`;

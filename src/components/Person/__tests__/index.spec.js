@@ -1,11 +1,12 @@
 import React from 'react';
-import { render, waitForElement, fireEvent } from '@testing-library/react';
-
+import { render, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import faker from 'faker';
 import Person from '../index';
 
 let removeItem = jest.fn();
 
-describe('SimpleSelect', () => {
+describe('Person', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -17,7 +18,7 @@ describe('SimpleSelect', () => {
     });
 
     it('With some data', () => {
-      const { baseElement, debug, queryByText, getByText } = render(
+      const { baseElement, getByText } = render(
         <Person
           name="Marcelo Bonifazio"
           color="black"
@@ -25,13 +26,32 @@ describe('SimpleSelect', () => {
           removeItem={removeItem}
         />
       );
-      // debug();
       expect(baseElement).toMatchSnapshot();
-      debug();
-      console.log(
-        getByText(/Marcelo Bonifazio/).getAttribute('style')
+      expect(getByText(/Marcelo Bonifazio/)).toBeInTheDocument();
+      expect(getByText(/Marcelo Bonifazio/)).toHaveStyle('color: black');
+    });
+
+    it('With another data', () => {
+      const { baseElement, getByText } = render(
+        <Person name="Teste" color="blue" id="5" removeItem={removeItem} />
       );
-      expect(queryByText(/Marcelo Bonifazio/)).toBeInTheDocument();
+      expect(baseElement).toMatchSnapshot();
+      expect(getByText(/Teste/)).toBeInTheDocument();
+      expect(getByText(/Teste/)).toHaveStyle('color: blue');
+    });
+
+    it('Action should remove correctly element', () => {
+      const id = faker.random.number(999999999).toString();
+
+      removeItem = value => {
+        expect(value).toStrictEqual(id);
+      };
+
+      const { baseElement, getByText } = render(
+        <Person name="Teste" color="blue" id={id} removeItem={removeItem} />
+      );
+      expect(baseElement).toMatchSnapshot();
+      fireEvent.click(getByText(/Teste/).parentNode.querySelector('button'));
     });
   });
 });
